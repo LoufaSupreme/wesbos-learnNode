@@ -1,13 +1,12 @@
 const mongoose = require('mongoose');
 mongoose.Promise = global.Promise;
-
 const slug = require('slugs');
 
 const storeSchema = new mongoose.Schema({
     name: {
         type: String,
         trim: true, //trims uploaded strings before adding to the db
-        required: 'Please enter a store name!' 
+        required: 'Please enter a store name!' // could also just put true, however it is better to put an error msg like this
     },
     slug: String,
     description: {
