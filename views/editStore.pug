@@ -1,3 +1,4 @@
+//- this template is used by the createStore and the editStore routes
 extends layout
 
 include mixins/_storeForm
@@ -5,5 +6,7 @@ include mixins/_storeForm
 block content 
     .inner 
         h2 #{title}
-        // the + is to use a mixin
-        +storeForm()
+        //- the + is to use a mixin
+        //- if a store is passed in (from the editStore route) then the info of that store will be used to prepopulate the mixin form
+        //- if a store is not passed in (e.g. from the createStore route) then store is null and nothing is passed to the mixin.
+        +storeForm(store)

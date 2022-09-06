@@ -2,7 +2,11 @@ mixin storeCard(store = {})
     .store 
         .store__hero
             .store__actions 
-                button soon 
+                .store__action.store__action--edit 
+                    a(href=`/stores/${store._id}/edit`)
+                        //- != means render html content as html, not plain text
+                        //- h.icon is accessing our icon helper in helpers.js, which will insert the svg code into the template for a particular icon
+                        != h.icon('pencil')
             img(src=`/uploads/${store.photo || 'store.png'}`)
             h2.title 
                 a(href=`/store/${store.slug}`) #{store.name}

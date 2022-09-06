@@ -22,5 +22,8 @@ router.get('/', storeController.myMiddleware, storeController.getStores);
 router.get('/stores', storeController.getStores);
 router.get('/add', storeController.addStore);
 router.post('/add', storeController.createStore);
+router.get('/stores/:store_id/edit', storeController.editStore);
+router.post('/add/:id', storeController.updateStore);
+
 
 module.exports = router;
