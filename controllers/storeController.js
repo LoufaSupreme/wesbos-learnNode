@@ -35,5 +35,10 @@ exports.createStore = async (req, res) => {
     catch(err) {
         throw Error(err);
     }
-    
+}
+
+exports.getStores = async (req, res) => {
+    // query db for list of all stores:
+    const stores = await Store.find();
+    res.render('stores', { title: 'Stores', stores: stores });
 }

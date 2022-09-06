@@ -18,7 +18,8 @@ const storeController = require('../controllers/storeController');
 //     res.send(...[req.params.word].reverse().join(''))
 // })
 
-router.get('/', storeController.myMiddleware, storeController.homePage);
+router.get('/', storeController.myMiddleware, storeController.getStores);
+router.get('/stores', storeController.getStores);
 router.get('/add', storeController.addStore);
 router.post('/add', storeController.createStore);
 
