@@ -24,4 +24,5 @@ That will populate 16 stores with 3 authors and 41 reviews. The logins for the a
 |Debbie Downer|debbie@example.com|debbie|
 |Beau|beau@example.com|beau|
 
-
+## Other Info:
+My google maps API: https://console.cloud.google.com/billing/0188A7-C77CE3-96F401?project=dang-thats-delicious-362221

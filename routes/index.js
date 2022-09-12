@@ -20,10 +20,20 @@ const storeController = require('../controllers/storeController');
 
 router.get('/', storeController.myMiddleware, storeController.getStores);
 router.get('/stores', storeController.getStores);
+// go to the Add Store page
 router.get('/add', storeController.addStore);
-router.post('/add', storeController.createStore);
 router.get('/stores/:store_id/edit', storeController.editStore);
-router.post('/add/:id', storeController.updateStore);
 
+// create a new store
+router.post('/add', 
+    storeController.upload, 
+    storeController.resize, 
+    storeController.createStore);
+
+// update an existing store
+router.post('/add/:id', 
+    storeController.upload, 
+    storeController.resize, 
+    storeController.updateStore);
 
 module.exports = router;
