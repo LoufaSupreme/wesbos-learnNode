@@ -105,3 +105,11 @@ exports.updateStore = async (req, res) => {
 
     // redirect to store and flash success msg
 }
+
+exports.getStoreBySlug = async (req, res, next) => {
+    const store = await Store.findOne({ slug: req.params.slug });
+    if (!store) {
+        return next();  // sends the program to the next function in app.js, which is the "app.use(errorHandlers.notFound)"
+    }
+    res.render('store', { store: store, title: store.name })
+}

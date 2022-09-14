@@ -9,6 +9,7 @@ const fs = require('fs');
 exports.moment = require('moment');
 
 // Dump is a handy debugging function we can use to sort of "console.log" our data
+// use it in the templates by making a pre element e.g. pre=h.dump(store) so you can render out raw data in json format
 exports.dump = (obj) => JSON.stringify(obj, null, 2);
 
 // Making a static map is really long - this is a handy helper function to make one

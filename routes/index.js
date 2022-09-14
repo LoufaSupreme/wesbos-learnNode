@@ -36,4 +36,7 @@ router.post('/add/:id',
     storeController.resize, 
     storeController.updateStore);
 
+// view individual store pages:
+router.get('/store/:slug', storeController.getStoreBySlug);
+
 module.exports = router;
