@@ -115,8 +115,18 @@ exports.getStoreBySlug = async (req, res, next) => {
 }
 
 exports.getStoresByTag = async (req, res) => {
-    const tags = await Store.getTagsList();
-    // res.json(tags) // print out response in json format
     const tag = req.params.tag;
-    res.render('tag', { tags: tags, tag: tag, title: 'Tags' })
+    
+    // get a list of of the tags, with their count of how many stores are tagged with that tag
+    const tagsPromise = Store.getTagsList();
+
+    // get a list of stores that have the target tag, or if there isnt a target tag, get a list of all the stores with ANY tag
+    const tagQuery = tag || { $exists: true };
+    const storesPromise = Store.find({ tags: tagQuery });
+
+    // do both promises concurrently and await them both
+    const [tags, stores] = await Promise.all([tagsPromise, storesPromise]);
+
+    // res.json(result) // print out response in json format
+    res.render('tag', { tags: tags, tag: tag, stores: stores, title: 'Tags' })
 }
