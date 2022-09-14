@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const storeController = require('../controllers/storeController');
+const userController = require('../controllers/userController');
 
 // router.get('/', (req, res) => {
 //     // the below renders the hello.pug file, and fills in the #{variables} using the below context object   
@@ -42,5 +43,8 @@ router.get('/store/:slug', storeController.getStoreBySlug);
 // view the tags page which sorts stores by tag:
 router.get('/tags', storeController.getStoresByTag);
 router.get('/tags/:tag', storeController.getStoresByTag);
+
+router.get('/login', userController.loginForm);
+router.get('/register', userController.registerForm);
 
 module.exports = router;

@@ -9,6 +9,7 @@
 /***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 __webpack_require__.r(__webpack_exports__);
+// google API autocomplete address input
 function autocomplete(input, latInput, lngInput) {
   if (!input) return; // skip if theres no address
 
