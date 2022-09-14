@@ -54,4 +54,17 @@ storeSchema.pre('save', async function(next) {
     next();
 })
 
+// make our own methods that we can call on the Store model (aka Store object)
+// this will find all the tags
+// import to use a proper "function()" here b/c we need to refer to "this"
+storeSchema.statics.getTagsList = function() {
+    // tip: to visualize what's happening in the db w/ this aggregate, use res.json() in the storeController function that calls getTagsList to
+    // print out what is being returned.
+    return this.aggregate([
+        { $unwind: '$tags' }, // makes a list of stores by tag 
+        { $group: { _id: '$tags', count: { $sum: 1 } }},  // groups the stores by tag, and sums them up.  Creates new object like {"_id": "Tag Name", "count": 2}
+        { $sort: { count: -1 }} // sort in descending order
+    ]);
+}
+
 module.exports = mongoose.model('Store', storeSchema);

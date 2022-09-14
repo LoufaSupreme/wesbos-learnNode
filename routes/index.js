@@ -39,4 +39,8 @@ router.post('/add/:id',
 // view individual store pages:
 router.get('/store/:slug', storeController.getStoreBySlug);
 
+// view the tags page which sorts stores by tag:
+router.get('/tags', storeController.getStoresByTag);
+router.get('/tags/:tag', storeController.getStoresByTag);
+
 module.exports = router;
