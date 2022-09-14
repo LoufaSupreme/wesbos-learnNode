@@ -1,0 +1,7 @@
+extends layout 
+
+include mixins/_registerForm.pug
+
+block content 
+    h2= title 
+    +registerForm(body)

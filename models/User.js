@@ -4,7 +4,7 @@ mongoose.Promise = global.Promise;
 const md5 = require('md5');
 const validator = require('validator');
 const mongodbErrorHandler = require ('mongoose-mongodb-errors'); // improves on the native mongodb error messages, particularly for unique: true errors
-const passportLocalMongoose = require('password-local-mongoose'); // tool for authentication
+const passportLocalMongoose = require('passport-local-mongoose'); // tool for authentication
 
 const userSchema = new Schema({
     email: {

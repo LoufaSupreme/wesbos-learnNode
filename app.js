@@ -11,6 +11,8 @@ const routes = require('./routes/index');
 const helpers = require('./helpers');
 const errorHandlers = require('./handlers/errorHandlers');
 
+require('./handlers/passport'); // our custom handler to configure the passport library
+
 // create our Express app
 const app = express();
 

@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const storeController = require('../controllers/storeController');
 const userController = require('../controllers/userController');
+const authController = require('../controllers/authController');
 
 // router.get('/', (req, res) => {
 //     // the below renders the hello.pug file, and fills in the #{variables} using the below context object   
@@ -46,5 +47,14 @@ router.get('/tags/:tag', storeController.getStoresByTag);
 
 router.get('/login', userController.loginForm);
 router.get('/register', userController.registerForm);
+
+// validate registiration data
+// register user
+// log them in 
+router.post('/register', 
+    userController.validateRegister,
+    userController.register,
+    authController.login,
+);
 
 module.exports = router;
