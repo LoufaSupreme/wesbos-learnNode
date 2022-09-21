@@ -61,6 +61,15 @@ router.post('/register',
 
 router.get('/logout', authController.logout);
 
-router.get('/account', userController.account);
+router.get('/account', authController.isLoggedIn, userController.account);
+router.post('/account', userController.updateAccount);
+
+// route for when user clicks to get their password changed
+router.post('/account/forgot', authController.forgot);
+
+// route user is given to reset their password, including an automatically generated reset token
+router.get('/account/reset/:token', authController.reset);
+router.post('/account/reset/:token', authController.confirmedPasswords, authController.update);
+
 
 module.exports = router;
