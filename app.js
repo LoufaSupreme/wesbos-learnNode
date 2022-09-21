@@ -11,7 +11,9 @@ const routes = require('./routes/index');
 const helpers = require('./helpers');
 const errorHandlers = require('./handlers/errorHandlers');
 
-require('./handlers/passport'); // our custom handler to configure the passport library
+// our custom handler to configure the passport library
+// the require statement invokes (runs) the code in ./handlers/passports
+require('./handlers/passport'); 
 
 // create our Express app
 const app = express();
@@ -51,10 +53,11 @@ app.use(passport.session());
 app.use(flash());
 
 // pass variables to our templates + all requests
+// passes helpful things like that User object, the custom helper functions, etc to every template
 app.use((req, res, next) => {
   res.locals.h = helpers;
   res.locals.flashes = req.flash();
-  res.locals.user = req.user || null;
+  res.locals.user = req.user || null;  // the passport library makes a user variable accessible on req automatically
   res.locals.currentPath = req.path;
   next();
 });

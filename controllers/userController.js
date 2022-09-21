@@ -41,11 +41,15 @@ exports.register = async (req, res, next) => {
         // the User.register method comes from the passportLocalMongoose plugin that we added in User.js
         // it helps with password hashing or something
         // need to promisify it first b/c this library is a bit outdated and uses callbacks instead of promises by default
-        const register = promisify(User.register, User);
-        await register(user, req.body.password);
+        const mongooseRegister = promisify(User.register, User);
+        await mongooseRegister(user, req.body.password);
         next();  // pass to authController.login
     }
     catch(err) {
         throw Error(err);
     }
 };
+
+exports.account = async (req, res) => {
+    res.render('account', {title: 'Edit Your Account'});
+}

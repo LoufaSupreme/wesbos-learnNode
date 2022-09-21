@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 mongoose.Promise = global.Promise;
-const md5 = require('md5');
+const md5 = require('md5');  // for gravatar - hashes users email address
 const validator = require('validator');
 const mongodbErrorHandler = require ('mongoose-mongodb-errors'); // improves on the native mongodb error messages, particularly for unique: true errors
 const passportLocalMongoose = require('passport-local-mongoose'); // tool for authentication
@@ -21,6 +21,15 @@ const userSchema = new Schema({
         trim: true,
     }
 });
+
+// gravator = globally recognized avatar
+// use a virtual field to store the user profile pic
+// this allows us to not store the actual image in the db
+// this function is called in layout.pug "img.avatar(src=user.gravatar + '&d=retro')"
+userSchema.virtual('gravatar').get(function() {
+    const hash = md5(this.email);
+    return `https://gravatar.com/avatar/${hash}?s=200`;
+})
 
 userSchema.plugin(passportLocalMongoose, { usernameField: 'email' });
 userSchema.plugin(mongodbErrorHandler)

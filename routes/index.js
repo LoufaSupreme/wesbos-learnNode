@@ -23,7 +23,7 @@ const authController = require('../controllers/authController');
 router.get('/', storeController.myMiddleware, storeController.getStores);
 router.get('/stores', storeController.getStores);
 // go to the Add Store page
-router.get('/add', storeController.addStore);
+router.get('/add', authController.isLoggedIn, storeController.addStore);
 router.get('/stores/:store_id/edit', storeController.editStore);
 
 // create a new store
@@ -46,6 +46,8 @@ router.get('/tags', storeController.getStoresByTag);
 router.get('/tags/:tag', storeController.getStoresByTag);
 
 router.get('/login', userController.loginForm);
+router.post('/login', authController.login);
+
 router.get('/register', userController.registerForm);
 
 // validate registiration data
@@ -56,5 +58,9 @@ router.post('/register',
     userController.register,
     authController.login,
 );
+
+router.get('/logout', authController.logout);
+
+router.get('/account', userController.account);
 
 module.exports = router;
