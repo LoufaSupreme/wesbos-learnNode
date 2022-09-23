@@ -60,6 +60,7 @@ exports.createStore = async (req, res) => {
     // uses the store schema (in Store.js) to create a new Store instance.
     // only uses the data in req.body that maps to the store schema.  Any other data not included in the store schema, but sent in the request anyway, will be ignored automatically.
     try {
+        req.body.author = req.user._id;
         const store = new Store(req.body);  
         const savedStore = await store.save();
         console.log('New store created');
@@ -77,12 +78,26 @@ exports.getStores = async (req, res) => {
     res.render('stores', { title: 'Stores', stores: stores });
 }
 
+// check if the user is the author of the store they are trying to edit:
+const confirmOwner = (store, user) => {
+    // author.equals is a built in method to compare mongo's ObjectIds
+    if (!store.author.equals(user._id)) {
+        return false;
+    }
+    return true;
+}
+
 exports.editStore = async (req, res) => {
     // find the store given the ID
     const store_id = req.params.store_id;
     const store = await Store.findOne({ _id: store_id });
     
     // confirm they are the ownder of the store
+    if (!confirmOwner(store, req.user)) {
+        req.flash('error', 'You need to own the store to edit it!');
+        res.redirect('back');
+        return;
+    };
 
     // render out the edit form so the user can update their store
     res.render('editStore', { title: `Edit ${store.name}`, store: store })
@@ -107,7 +122,9 @@ exports.updateStore = async (req, res) => {
 }
 
 exports.getStoreBySlug = async (req, res, next) => {
-    const store = await Store.findOne({ slug: req.params.slug });
+    // .populate('author') will replace the author _id with all the authors info (from the User schema).
+    // without populating we would only get the authors _id number
+    const store = await Store.findOne({ slug: req.params.slug }).populate('author');
     if (!store) {
         return next();  // sends the program to the next function in app.js, which is the "app.use(errorHandlers.notFound)"
     }
