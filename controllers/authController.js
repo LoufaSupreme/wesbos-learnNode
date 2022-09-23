@@ -110,7 +110,8 @@ exports.update = async (req, res) => {
         const setPassword = promisify(user.setPassword, user);
         await setPassword(req.body.password)
         
-        // remove the reset token info from the user
+        // remove the reset token fields from the user
+        // mongodb will delete fields that are undefined
         user.resetPasswordToken = undefined;
         user.resetPasswordExpires = undefined;
 
