@@ -5,6 +5,7 @@ const passport = require('passport');
 const User = require('../models/User');
 const crypto = require('crypto');  // built in Node module that generates token strings
 const promisify = require('es6-promisify');
+const mail = require('../handlers/mail');
 
 exports.login = passport.authenticate('local', {
     failureRedirect: '/login',
@@ -49,8 +50,13 @@ exports.forgot = async (req, res) => {
         // send them an email with the token
         // req.headers.host will give you the domain name of the website.  For dev it will be localhost:PORT but for production it will figure it out
         const resetURL = `http://${req.headers.host}/account/reset/${user.resetPasswordToken}`;
-        req.flash('success', `You have been emailed a password reset link. ${resetURL}`);
-        
+        await mail.send({
+            user: user,
+            subject: 'Password Reset',
+            resetURL: resetURL,
+            filename: 'password-reset', // looks for the password-reset.pug file
+        });     
+        req.flash('success', 'You have been emailed a password reset link.');
         // redirect to login page
         res.redirect('/login');
     }
