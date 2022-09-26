@@ -150,21 +150,26 @@ exports.getStoresByTag = async (req, res) => {
 
 // seach for stores with the query text in the name or description:
 exports.searchStores = async (req, res) => {
-    const stores = await Store
-        .find({
-            // can perform a $text query on the db b/c we indexed the name and description as text in Store.js (storeScheme.index...)
-            $text: {
-                $search: req.query.q,
-            }
-        }, 
-        // and then "project" (i.e. temporarily add an additional field to the returned data) that indicates how relevant the result is to the search query
-        // we will assign a "score" using mongo's built in 'textScore' metadata
-        {
-            score: { $meta: 'textScore' }
-        })
-        // sort by descrending textScore
-        .sort({ score: { $meta: 'textScore' }})
-        // limit to first 5 results
-        .limit(5);
-    res.json(stores)
+    try {
+        const stores = await Store
+            .find({
+                // can perform a $text query on the db b/c we indexed the name and description as text in Store.js (storeScheme.index...)
+                $text: {
+                    $search: req.query.q,
+                }
+            }, 
+            // and then "project" (i.e. temporarily add an additional field to the returned data) that indicates how relevant the result is to the search query
+            // we will assign a "score" using mongo's built in 'textScore' metadata
+            {
+                score: { $meta: 'textScore' }
+            })
+            // sort by descrending textScore
+            .sort({ score: { $meta: 'textScore' }})
+            // limit to first 5 results
+            .limit(5);
+        res.json(stores)
+    }
+    catch(err) {
+        throw Error(err);
+    }
 }
