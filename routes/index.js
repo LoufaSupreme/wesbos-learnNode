@@ -71,5 +71,7 @@ router.post('/account/forgot', authController.forgot);
 router.get('/account/reset/:token', authController.reset);
 router.post('/account/reset/:token', authController.confirmedPasswords, authController.update);
 
+// API endpoints
+router.get('/api/search', storeController.searchStores);
 
 module.exports = router;
