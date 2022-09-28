@@ -33,7 +33,7 @@ exports.isLoggedIn = (req, res, next) => {
 }
 
 // if user forgets password and requests to change it
-exports.forgot = async (req, res) => {
+exports.forgot = async (req, res, next) => {
     try {
         // see if user w/ that email exists
         const user = await User.findOne({ email: req.body.email });
@@ -61,12 +61,12 @@ exports.forgot = async (req, res) => {
         res.redirect('/login');
     }
     catch(err) {
-        throw Error(err);
+        next(err);
     }
 }
 
 // reset a user password
-exports.reset = async (req, res) => {
+exports.reset = async (req, res, next) => {
     try {
         // find user with this reset token, and check that it hasn't expired
         const user = await User.findOne({
@@ -81,7 +81,7 @@ exports.reset = async (req, res) => {
         res.render('reset', { title: 'Reset your password' });
     }
     catch(err) {
-        throw Error(err);
+        next(err);
     }
 }
 
@@ -96,7 +96,7 @@ exports.confirmedPasswords = (req, res, next) => {
 }
 
 // update user password in db:
-exports.update = async (req, res) => {
+exports.update = async (req, res, next) => {
     try {
         // find user with this reset token, and check that it hasn't expired
         const user = await User.findOne({
@@ -130,6 +130,6 @@ exports.update = async (req, res) => {
         res.redirect('/');
     }
     catch(err) {
-        throw Error(err);
+        next(err);
     }
 }

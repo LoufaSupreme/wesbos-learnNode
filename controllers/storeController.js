@@ -21,19 +21,24 @@ const multerOptions = {
 exports.upload = multer(multerOptions).single('photo')
 
 exports.resize = async (req, res, next) => {
-    // check if there is no new file to resize
-    if (!req.file) {
-        next(); // skip to next middleware
-        return;
+    try {
+        // check if there is no new file to resize
+        if (!req.file) {
+            next(); // skip to next middleware
+            return;
+        }
+        // console.log(req.file);
+        const fileExtension = req.file.mimetype.split('/')[1]; // get the type of image
+        req.body.photo = `${uuid.v4()}.${fileExtension}`; // create a new unique name for the image
+        // resize photo:
+        const photo = await jimp.read(req.file.buffer); // pass in image buffer to jimp
+        await photo.resize(800, jimp.AUTO); // length and width
+        await photo.write(`./public/uploads/${req.body.photo}`);  // save the resized image to the public folder
+        next(); 
     }
-    // console.log(req.file);
-    const fileExtension = req.file.mimetype.split('/')[1]; // get the type of image
-    req.body.photo = `${uuid.v4()}.${fileExtension}`; // create a new unique name for the image
-    // resize photo:
-    const photo = await jimp.read(req.file.buffer); // pass in image buffer to jimp
-    await photo.resize(800, jimp.AUTO); // length and width
-    await photo.write(`./public/uploads/${req.body.photo}`);  // save the resized image to the public folder
-    next(); 
+    catch(err) {
+        next(err);
+    }
 }
 
 exports.myMiddleware = (req, res, next) => {
@@ -56,7 +61,7 @@ exports.addStore = (req, res) => {
     })
 }
 
-exports.createStore = async (req, res) => {
+exports.createStore = async (req, res, next) => {
     // uses the store schema (in Store.js) to create a new Store instance.
     // only uses the data in req.body that maps to the store schema.  Any other data not included in the store schema, but sent in the request anyway, will be ignored automatically.
     try {
@@ -68,14 +73,19 @@ exports.createStore = async (req, res) => {
         res.redirect(`/store/${savedStore.slug}`);
     }
     catch(err) {
-        throw Error(err);
+        next(err);
     }
 }
 
-exports.getStores = async (req, res) => {
-    // query db for list of all stores:
-    const stores = await Store.find();
-    res.render('stores', { title: 'Stores', stores: stores });
+exports.getStores = async (req, res, next) => {
+    try {
+        // query db for list of all stores:
+        const stores = await Store.find();
+        res.render('stores', { title: 'Stores', stores: stores });
+    }
+    catch(err) {
+        next(err);
+    }
 }
 
 // check if the user is the author of the store they are trying to edit:
@@ -87,69 +97,89 @@ const confirmOwner = (store, user) => {
     return true;
 }
 
-exports.editStore = async (req, res) => {
-    // find the store given the ID
-    const store_id = req.params.store_id;
-    const store = await Store.findOne({ _id: store_id });
-    
-    // confirm they are the ownder of the store
-    if (!confirmOwner(store, req.user)) {
-        req.flash('error', 'You need to own the store to edit it!');
-        res.redirect('back');
-        return;
-    };
+exports.editStore = async (req, res, next) => {
+    try {
+        // find the store given the ID
+        const store_id = req.params.store_id;
+        const store = await Store.findOne({ _id: store_id });
 
-    // render out the edit form so the user can update their store
-    res.render('editStore', { title: `Edit ${store.name}`, store: store })
+        // confirm they are the ownder of the store
+        if (!confirmOwner(store, req.user)) {
+            req.flash('error', 'You need to own the store to edit it!');
+            res.redirect('back');
+            return;
+        };
+
+        // render out the edit form so the user can update their store
+        res.render('editStore', { title: `Edit ${store.name}`, store: store })
+    }
+    catch(err) {
+        next(err);
+    }
+    
 }
 
-exports.updateStore = async (req, res) => {
-    // set the location data to be a point 
-    // need to do this manually since findOneandUpdate doesn't take into account the schema defaults
-    // note however that creating a store does take into account the schema defaults, so this isn't needed in the createStore function
-    req.body.location.type = 'Point';
+exports.updateStore = async (req, res, next) => {
+    try {
+        // set the location data to be a point 
+        // need to do this manually since findOneandUpdate doesn't take into account the schema defaults
+        // note however that creating a store does take into account the schema defaults, so this isn't needed in the createStore function
+        req.body.location.type = 'Point';
 
-    // find and update the store
-    const store = await Store.findOneAndUpdate({_id: req.params.id }, req.body, { 
-        new: true, // return newly updated store, not the old unupdated version
-        runValidators: true, // forces validation of the options set in the Store model, e.g. required:true for name and trim:true for description, etc
-    }).exec(); // runs the query
-
-    req.flash('success', `Successfully updated <strong>${store.name}</strong>. <a href="/stores/${store.slug}">View Store </a>`);
-    res.redirect(`/stores/${store._id}/edit`);
-
-    // redirect to store and flash success msg
+        // find and update the store
+        const store = await Store.findOneAndUpdate({_id: req.params.id }, req.body, { 
+            new: true, // return newly updated store, not the old unupdated version
+            runValidators: true, // forces validation of the options set in the Store model, e.g. required:true for name and trim:true for description, etc
+        }).exec(); // runs the query
+        
+        // redirect to store and flash success msg
+        req.flash('success', `Successfully updated <strong>${store.name}</strong>. <a href="/store/${store.slug}">View Store </a>`);
+        res.redirect(`/stores/${store._id}/edit`);
+    }
+    catch(err){
+        next(err);
+    }
 }
 
 exports.getStoreBySlug = async (req, res, next) => {
-    // .populate('author') will replace the author _id with all the authors info (from the User schema).
-    // without populating we would only get the authors _id number
-    const store = await Store.findOne({ slug: req.params.slug }).populate('author');
-    if (!store) {
-        return next();  // sends the program to the next function in app.js, which is the "app.use(errorHandlers.notFound)"
+    try {
+        // .populate('author') will replace the author _id with all the authors info (from the User schema).
+        // without populating we would only get the authors _id number
+        const store = await Store.findOne({ slug: req.params.slug }).populate('author');
+        if (!store) {
+            return next();  // sends the program to the next function in app.js, which is the "app.use(errorHandlers.notFound)"
+        }
+        res.render('store', { store: store, title: store.name });
     }
-    res.render('store', { store: store, title: store.name })
+    catch(err) {
+        next(err);
+    }    
 }
 
-exports.getStoresByTag = async (req, res) => {
-    const tag = req.params.tag;
-    
-    // get a list of of the tags, with their count of how many stores are tagged with that tag
-    const tagsPromise = Store.getTagsList();
+exports.getStoresByTag = async (req, res, next) => {
+    try {
+        const tag = req.params.tag;
+        
+        // get a list of of the tags, with their count of how many stores are tagged with that tag
+        const tagsPromise = Store.getTagsList();
 
-    // get a list of stores that have the target tag, or if there isnt a target tag, get a list of all the stores with ANY tag
-    const tagQuery = tag || { $exists: true };
-    const storesPromise = Store.find({ tags: tagQuery });
+        // get a list of stores that have the target tag, or if there isnt a target tag, get a list of all the stores with ANY tag
+        const tagQuery = tag || { $exists: true };
+        const storesPromise = Store.find({ tags: tagQuery });
 
-    // do both promises concurrently and await them both
-    const [tags, stores] = await Promise.all([tagsPromise, storesPromise]);
+        // do both promises concurrently and await them both
+        const [tags, stores] = await Promise.all([tagsPromise, storesPromise]);
 
-    // res.json(result) // print out response in json format
-    res.render('tag', { tags: tags, tag: tag, stores: stores, title: 'Tags' })
+        // res.json(result) // print out response in json format
+        res.render('tag', { tags: tags, tag: tag, stores: stores, title: 'Tags' });
+    }
+    catch(err) {
+        next(err);
+    }
 }
 
 // seach for stores with the query text in the name or description:
-exports.searchStores = async (req, res) => {
+exports.searchStores = async (req, res, next) => {
     try {
         const stores = await Store
             .find({
@@ -170,6 +200,7 @@ exports.searchStores = async (req, res) => {
         res.json(stores)
     }
     catch(err) {
-        throw Error(err);
+        console.log('There was an error in searchStores:', err);
+        next(err);
     }
 }

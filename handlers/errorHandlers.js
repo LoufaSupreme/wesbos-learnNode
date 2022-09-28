@@ -6,6 +6,7 @@
   catchErrors(), catch any errors they throw, and pass it along to our express middleware with next()
 */
 
+// returns a new anonymous function that
 exports.catchErrors = (fn) => {
   return function(req, res, next) {
     return fn(req, res, next).catch(next);
@@ -20,7 +21,7 @@ exports.catchErrors = (fn) => {
 exports.notFound = (req, res, next) => {
   const err = new Error('Not Found');
   err.status = 404;
-  next(err);
+  next(err); // if you pass next an argument, it assumes it is an error
 };
 
 /*
