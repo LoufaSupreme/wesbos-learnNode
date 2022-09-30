@@ -74,4 +74,8 @@ router.post('/account/reset/:token', authController.confirmedPasswords, authCont
 // API endpoints
 router.get('/api/search', storeController.searchStores);
 
+router.get('/api/stores/near', storeController.mapStores);
+
+router.get('/map', storeController.mapPage);
+
 module.exports = router;

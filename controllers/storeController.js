@@ -204,3 +204,33 @@ exports.searchStores = async (req, res, next) => {
         next(err);
     }
 }
+
+// find all stores within 10km of target lat/lng
+// remember: mongo expects coords to be in [lng, lat] format
+exports.mapStores = async (req, res, next) => {
+    try {
+        const coords = [req.query.lng, req.query.lat].map(parseFloat);
+        const query = {
+            location: {
+                $near: {
+                    $geometry: {
+                        type: 'Point',
+                        coordinates: coords,
+                    },
+                    $maxDistance: 10000 // 10km
+                }
+            }
+        }
+        // .select lets us pick and choose which fields we want to return
+        const stores = await Store.find(query).select('slug name description location photo');
+        res.json(stores);
+    }
+    catch(err) {
+        next(err);
+    }
+}
+
+// show a map of all the stores
+exports.mapPage = (req, res) => {
+    res.render('map', { title: 'Map' });
+}
