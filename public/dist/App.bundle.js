@@ -2208,6 +2208,48 @@ NodeList.prototype.on = NodeList.prototype.addEventListener = function (name, fn
 
 /***/ }),
 
+/***/ "./public/javascripts/modules/hearts.js":
+/*!**********************************************!*\
+  !*** ./public/javascripts/modules/hearts.js ***!
+  \**********************************************/
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
+/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _bling__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./bling */ "./public/javascripts/modules/bling.js");
+
+ // send data to the db via a fetch call and update the DOM
+
+function ajaxHeart(e) {
+  var _this = this;
+
+  e.preventDefault();
+  console.log('Heart that store!');
+  axios__WEBPACK_IMPORTED_MODULE_0___default().post(this.action) // this = the heart form of the store. this.action is the URL to POST to
+  .then(function (res) {
+    // toggle the class on the heart button
+    var isHearted = _this.heart.classList.toggle('heart__button--hearted'); // the actual heart button.  Can use dot notation to access it b/c we put a name="heart" in the html
+    // update the heart count:
+
+
+    (0,_bling__WEBPACK_IMPORTED_MODULE_1__.$)('.heart-count').textContent = res.data.hearts.length; // add floating heart animation class:
+
+    if (isHearted) {
+      _this.heart.classList.add('heart__button--float');
+
+      setTimeout(function () {
+        return _this.heart.classList.remove('heart__button--float');
+      }, 2500);
+    }
+  }).catch(console.error);
+}
+
+/* harmony default export */ __webpack_exports__["default"] = (ajaxHeart);
+
+/***/ }),
+
 /***/ "./public/javascripts/modules/map.js":
 /*!*******************************************!*\
   !*** ./public/javascripts/modules/map.js ***!
@@ -3901,6 +3943,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _modules_autocomplete__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./modules/autocomplete */ "./public/javascripts/modules/autocomplete.js");
 /* harmony import */ var _modules_typeAhead__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./modules/typeAhead */ "./public/javascripts/modules/typeAhead.js");
 /* harmony import */ var _modules_map__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./modules/map */ "./public/javascripts/modules/map.js");
+/* harmony import */ var _modules_hearts__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./modules/hearts */ "./public/javascripts/modules/hearts.js");
  // shortcuts for document.querySelector and addEventListener
 
  // autocompletes lat/lng from an address
@@ -3909,10 +3952,15 @@ __webpack_require__.r(__webpack_exports__);
 
  // for making a google map
 
+ // for hearting stores
+
 
 (0,_modules_autocomplete__WEBPACK_IMPORTED_MODULE_2__["default"])((0,_modules_bling__WEBPACK_IMPORTED_MODULE_1__.$)('#address'), (0,_modules_bling__WEBPACK_IMPORTED_MODULE_1__.$)('#lat'), (0,_modules_bling__WEBPACK_IMPORTED_MODULE_1__.$)('#lng'));
 (0,_modules_typeAhead__WEBPACK_IMPORTED_MODULE_3__["default"])((0,_modules_bling__WEBPACK_IMPORTED_MODULE_1__.$)('.search'));
-(0,_modules_map__WEBPACK_IMPORTED_MODULE_4__["default"])((0,_modules_bling__WEBPACK_IMPORTED_MODULE_1__.$)('#map'));
+(0,_modules_map__WEBPACK_IMPORTED_MODULE_4__["default"])((0,_modules_bling__WEBPACK_IMPORTED_MODULE_1__.$)('#map')); // $$ is document.querySelectorAll from bling.js
+
+var heartForms = (0,_modules_bling__WEBPACK_IMPORTED_MODULE_1__.$$)('form.heart');
+heartForms.on('submit', _modules_hearts__WEBPACK_IMPORTED_MODULE_5__["default"]);
 }();
 /******/ })()
 ;

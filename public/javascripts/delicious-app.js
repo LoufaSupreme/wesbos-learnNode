@@ -12,8 +12,15 @@ import typeAhead from './modules/typeAhead';
 // for making a google map
 import makeMap from './modules/map';
 
+// for hearting stores
+import ajaxHeart from './modules/hearts'
+
 autocomplete( $('#address'), $('#lat'), $('#lng') );
 
 typeAhead( $('.search') );
 
 makeMap( $('#map') );
+
+// $$ is document.querySelectorAll from bling.js
+const heartForms = $$('form.heart');
+heartForms.on('submit', ajaxHeart);

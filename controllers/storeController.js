@@ -1,9 +1,10 @@
-
 const mongoose = require('mongoose');
 const Store = mongoose.model('Store');  // set in Store.js
+const User = mongoose.model('User');  // set in User.js
 const multer = require("multer"); // package for uplaoding multiple files.  Needed since our _storeForm.pug has a form w/ enctype=multipart/form-data
 const jimp = require("jimp"); // for image uploads
 const uuid = require("uuid"); // helps with making unique file names for uploaded files (to avoid duplicates)
+
 
 const multerOptions = {
     storage: multer.memoryStorage(),  // initially load file into local memory
@@ -233,4 +234,21 @@ exports.mapStores = async (req, res, next) => {
 // show a map of all the stores
 exports.mapPage = (req, res) => {
     res.render('map', { title: 'Map' });
+}
+
+// heart a store:
+// adds the store ID to the user object, under the hearts field
+exports.heartStore = async (req, res, next) => {
+    try {
+        const hearts = req.user.hearts.map(obj => obj.toString()) // convert user IDs (which are mongodb ObjectIds) to strings
+        const operator = hearts.includes(req.params.id) ? '$pull' : '$addToSet';
+        const user = await User.findByIdAndUpdate(req.user._id, 
+            { [operator]: { hearts: req.params.id } }, 
+            { new: true }
+        );
+        res.json(user)
+    }
+    catch(err) {
+        next(err);
+    }
 }

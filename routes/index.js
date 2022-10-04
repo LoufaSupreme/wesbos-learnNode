@@ -71,11 +71,14 @@ router.post('/account/forgot', authController.forgot);
 router.get('/account/reset/:token', authController.reset);
 router.post('/account/reset/:token', authController.confirmedPasswords, authController.update);
 
+router.get('/map', storeController.mapPage);
+
+
 // API endpoints
 router.get('/api/search', storeController.searchStores);
 
 router.get('/api/stores/near', storeController.mapStores);
 
-router.get('/map', storeController.mapPage);
+router.post('/api/stores/:id/heart', storeController.heartStore)
 
 module.exports = router;
