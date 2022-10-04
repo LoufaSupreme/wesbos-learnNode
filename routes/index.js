@@ -73,6 +73,8 @@ router.post('/account/reset/:token', authController.confirmedPasswords, authCont
 
 router.get('/map', storeController.mapPage);
 
+router.get('/hearts', authController.isLoggedIn, storeController.getHearts);
+
 
 // API endpoints
 router.get('/api/search', storeController.searchStores);

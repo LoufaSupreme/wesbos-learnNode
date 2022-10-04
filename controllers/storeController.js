@@ -252,3 +252,16 @@ exports.heartStore = async (req, res, next) => {
         next(err);
     }
 }
+
+// show hearted stores
+exports.getHearts = async (req, res, next) => {
+    try {
+        const stores = await Store.find({
+            _id: { $in: req.user.hearts }, // checks if a store _id is in the array of hearted stores on the user object
+        });
+        res.render('stores', { title: 'Hearted Stores', stores: stores });
+    }
+    catch(err) {
+        next(err);
+    }
+}
