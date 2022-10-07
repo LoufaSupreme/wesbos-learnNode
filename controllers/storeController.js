@@ -146,7 +146,9 @@ exports.getStoreBySlug = async (req, res, next) => {
     try {
         // .populate('author') will replace the author _id with all the authors info (from the User schema).
         // without populating we would only get the authors _id number
-        const store = await Store.findOne({ slug: req.params.slug }).populate('author');
+        // Do same with reviews.  The reviews field will be a virtual field (i.e. its not actually in our store schema)
+        // Reviews are added as a virtual field in Store.js at the bottom: storeSchema.virtual('Reviews', ...)
+        const store = await Store.findOne({ slug: req.params.slug }).populate('author reviews');
         if (!store) {
             return next();  // sends the program to the next function in app.js, which is the "app.use(errorHandlers.notFound)"
         }

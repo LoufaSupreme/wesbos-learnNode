@@ -28,6 +28,12 @@ const userSchema = new Schema({
             ref: 'Store',
         }
     ]
+},
+// add additional option to display virtual fields (like our gravatar field) when displaying store data in JSON or as objects.
+// without this, virtual fields would still be present, but they wouldn't be displayed when using res.json(), for example. 
+{
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
 });
 
 // gravator = globally recognized avatar

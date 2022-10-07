@@ -27,4 +27,15 @@ const reviewSchema = new mongoose.Schema({
     }
 });
 
+// populates the author data for each review
+// so instead of just having author: 4987239847293842, we have author: { name: Josh, email: josh.davi.... } etc
+function autoPopulate(next) {
+    this.populate('author');
+    next();
+}
+
+// run autopopulate everytime we find or findOne review
+reviewSchema.pre('find', autoPopulate);
+reviewSchema.pre('findOne', autoPopulate);
+
 module.exports = mongoose.model('Review', reviewSchema);

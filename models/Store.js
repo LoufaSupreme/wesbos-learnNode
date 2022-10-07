@@ -38,6 +38,12 @@ const storeSchema = new mongoose.Schema({
         ref: 'User',
         required: 'You must supply an author'
     },
+},
+// add additional option to display virtual fields (like our reviews field) when displaying store data in JSON or as objects.
+// without this, virtual fields would still be present, but they wouldn't be displayed when using res.json(), for example. 
+{
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
 });
 
 // Define our indexes, to make querying more efficient
@@ -72,7 +78,7 @@ storeSchema.pre('save', async function(next) {
 
 // make our own methods that we can call on the Store model (aka Store object)
 // this will find all the tags
-// import to use a proper "function()" here b/c we need to refer to "this"
+// important to use a proper "function()" here b/c we need to refer to "this"
 storeSchema.statics.getTagsList = function() {
     // tip: to visualize what's happening in the db w/ this aggregate, use res.json() in the storeController function that calls getTagsList to
     // print out what is being returned.
@@ -82,5 +88,13 @@ storeSchema.statics.getTagsList = function() {
         { $sort: { count: -1 }} // sort in descending order
     ]);
 }
+
+// get all reviews for a store:
+// find reviews where the store._id === review.store id
+storeSchema.virtual('reviews', {
+    ref: 'Review', // link to the Review model
+    localField: '_id',  // use the store._id as the target
+    foreignField: 'store',  // and then look at the "store" field of the Review model for that store._id
+})
 
 module.exports = mongoose.model('Store', storeSchema);
