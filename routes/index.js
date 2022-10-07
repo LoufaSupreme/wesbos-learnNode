@@ -3,6 +3,7 @@ const router = express.Router();
 const storeController = require('../controllers/storeController');
 const userController = require('../controllers/userController');
 const authController = require('../controllers/authController');
+const reviewController = require('../controllers/reviewController');
 
 // router.get('/', (req, res) => {
 //     // the below renders the hello.pug file, and fills in the #{variables} using the below context object   
@@ -75,6 +76,7 @@ router.get('/map', storeController.mapPage);
 
 router.get('/hearts', authController.isLoggedIn, storeController.getHearts);
 
+router.post('/review/:id', authController.isLoggedIn, reviewController.addReview);
 
 // API endpoints
 router.get('/api/search', storeController.searchStores);
