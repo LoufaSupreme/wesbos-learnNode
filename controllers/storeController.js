@@ -267,3 +267,14 @@ exports.getHearts = async (req, res, next) => {
         next(err);
     }
 }
+
+exports.getTopStores = async (req, res, next) => {
+    try {
+        const stores = await Store.getTopStores();
+        res.render('topStores', { stores: stores, title: 'Top Stores' });
+        // res.json(stores)
+    }
+    catch(err) {
+        next(err);
+    }
+}

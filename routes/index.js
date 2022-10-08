@@ -78,6 +78,8 @@ router.get('/hearts', authController.isLoggedIn, storeController.getHearts);
 
 router.post('/review/:id', authController.isLoggedIn, reviewController.addReview);
 
+router.get('/top', storeController.getTopStores);
+
 // API endpoints
 router.get('/api/search', storeController.searchStores);
 

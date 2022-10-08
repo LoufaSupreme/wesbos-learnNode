@@ -79,6 +79,7 @@ storeSchema.pre('save', async function(next) {
 // make our own methods that we can call on the Store model (aka Store object)
 // this will find all the tags
 // important to use a proper "function()" here b/c we need to refer to "this"
+// returns a promise
 storeSchema.statics.getTagsList = function() {
     // tip: to visualize what's happening in the db w/ this aggregate, use res.json() in the storeController function that calls getTagsList to
     // print out what is being returned.
@@ -89,6 +90,37 @@ storeSchema.statics.getTagsList = function() {
     ]);
 }
 
+// get a list of the top rated stores
+// returns a promise
+storeSchema.statics.getTopStores = function() {
+    return this.aggregate([
+        // lookup stores and populate their reviews
+        // this is very similar to the storeSchema.virtual('reviews') code below, but acts directly on mongoDB rather than on mongoose.  Don't ask me what that means
+        // from: 'reviews' is the line that tells mongo which model to look at.  Mongo lowercases and adds an 's' to all model names, so Review becomes reviews...
+        // so, this line in english is: go to the Review model, look at the store field of each review, aggregate the reviews for each each unique store._id, and add a virtual field called 'reviews' to the store.
+        // run res.json(stores) in storeController.getTopStores to see the output
+        { $lookup: { from: 'reviews', localField: '_id', foreignField: 'store', as: 'reviews' } },
+        // filter for items that have 2 or more reviews
+        // reviews.1 is mongo's way of indexing (e.g. its like saying reviews[1])
+        // so we are looking for stores which have a non null review entry in the second slot of the reviews array for that store (reviews[1])
+        { $match: { 'reviews.1': { $exists: true } } },
+        // add the average reviews field
+        // note that project will add a new field, but will cause the rest of the fields (like store.author, store.photo, etc) to disappear..
+        // so we need to manually add them back in...
+        { $project: { 
+            averageRating: { $avg: '$reviews.rating' },
+            photo: '$$ROOT.photo', // $$ROOT is a reference to the original document (model instance) in mongoDB
+            name: '$$ROOT.name',
+            slug: '$$ROOT.slug',
+            reviews: '$$ROOT.reviews',
+        } },
+        // sort it by our new field, highest reviews first
+        { $sort: { averageRating: -1 } },
+        // limit to 10
+        { $limit: 10 }
+    ]);
+}
+
 // get all reviews for a store:
 // find reviews where the store._id === review.store id
 storeSchema.virtual('reviews', {
@@ -96,5 +128,15 @@ storeSchema.virtual('reviews', {
     localField: '_id',  // use the store._id as the target
     foreignField: 'store',  // and then look at the "store" field of the Review model for that store._id
 })
+
+// automaticlly populate the virtual field "reviews" on every store, so that the reviews field shows up in json
+function autoPopulateReviews(next) {
+    this.populate('reviews');
+    next();
+}
+
+// auto populate review field everytime we find or findOne store
+storeSchema.pre('find', autoPopulateReviews);
+storeSchema.pre('findOne', autoPopulateReviews);
 
 module.exports = mongoose.model('Store', storeSchema);
