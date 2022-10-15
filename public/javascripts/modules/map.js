@@ -12,7 +12,6 @@ function loadPlaces(map, lat=43.2, lng=-79.8) {
             const places = res.data;
             if (!places.length) return alert('no places found!');
             
-
             // initialize boundaries for the map, so that it zooms in but shows all the markers:
             // these bounds need to be adjusted whenever we add a marker
             const bounds = new google.maps.LatLngBounds();
@@ -63,6 +62,10 @@ function makeMap(mapDiv) {
     loadPlaces(map)
     const input = $('[name="geolocate"]');
     const autocomplete = new google.maps.places.Autocomplete(input);
+
+    map.addListener('dragend', () => {
+        loadPlaces(map, map.getCenter().lat(), map.getCenter().lng())
+    });
 
     autocomplete.addListener('place_changed', () => {
         const place = autocomplete.getPlace();

@@ -2335,6 +2335,9 @@ function makeMap(mapDiv) {
   loadPlaces(map);
   var input = (0,_bling__WEBPACK_IMPORTED_MODULE_1__.$)('[name="geolocate"]');
   var autocomplete = new google.maps.places.Autocomplete(input);
+  map.addListener('dragend', function () {
+    loadPlaces(map, map.getCenter().lat(), map.getCenter().lng());
+  });
   autocomplete.addListener('place_changed', function () {
     var place = autocomplete.getPlace();
     loadPlaces(map, place.geometry.location.lat(), place.geometry.location.lng());
