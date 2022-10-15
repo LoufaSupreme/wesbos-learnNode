@@ -52,6 +52,7 @@ storeSchema.index({
     description: 'text',
 });
 
+// these need to be separate from the above indexes
 storeSchema.index({
     location: '2dsphere',
 })
@@ -97,14 +98,14 @@ storeSchema.statics.getTopStores = function() {
         // lookup stores and populate their reviews
         // this is very similar to the storeSchema.virtual('reviews') code below, but acts directly on mongoDB rather than on mongoose.  Don't ask me what that means
         // from: 'reviews' is the line that tells mongo which model to look at.  Mongo lowercases and adds an 's' to all model names, so Review becomes reviews...
-        // so, this line in english is: go to the Review model, look at the store field of each review, aggregate the reviews for each each unique store._id, and add a virtual field called 'reviews' to the store.
+        // so, this line in english is: go to the Review model, look at the store field of each review, aggregate the reviews for each unique store._id, and add a virtual field called 'reviews' to the store.
         // run res.json(stores) in storeController.getTopStores to see the output
         { $lookup: { from: 'reviews', localField: '_id', foreignField: 'store', as: 'reviews' } },
         // filter for items that have 2 or more reviews
         // reviews.1 is mongo's way of indexing (e.g. its like saying reviews[1])
         // so we are looking for stores which have a non null review entry in the second slot of the reviews array for that store (reviews[1])
         { $match: { 'reviews.1': { $exists: true } } },
-        // add the average reviews field
+        // add the averageRating field
         // note that project will add a new field, but will cause the rest of the fields (like store.author, store.photo, etc) to disappear..
         // so we need to manually add them back in...
         { $project: { 

@@ -80,6 +80,8 @@ router.post('/review/:id', authController.isLoggedIn, reviewController.addReview
 
 router.get('/top', storeController.getTopStores);
 
+router.get('/stores/page/:page', storeController.getStores)
+
 // API endpoints
 router.get('/api/search', storeController.searchStores);
 
